@@ -26,13 +26,10 @@ io.of('/').on('connection', (socket)=>{ //it emits it, when client connects on t
 })
 
 
-
-
-
-
-
-
 namespaces.forEach((namespace)=>{
-    io.of(namespace.endpoint).on('connection', (socket)=>{
+    io.of(namespace.endpoint).on('connection', (nsSocket)=>{
+        //a socket has connected to chatgroup namespace
+        //sending the namespace group info back
+        nsSocket.emit('nsRoomLoad', namespaces[0].rooms)
     })
 })
