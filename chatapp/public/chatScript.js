@@ -6,7 +6,6 @@ const socket = io('http://localhost:9000', {
 }); // /endpoint
 let nsSocket = "";
 
-
 //listener for nsList
 socket.on('nsList', (nsData)=>{
     let namespacesDiv = document.querySelector('.namespaces'); //get class namespaces
@@ -24,6 +23,8 @@ socket.on('nsList', (nsData)=>{
             joinNs(nsEndPoint)
         })
     })
+
+    //user connects to first namespace and first room at the beginning.
     const topNs = document.getElementsByClassName('namespace').item(0)
     const topNsName = topNs.getAttribute('ns')
     joinNs(topNsName);

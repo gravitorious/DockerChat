@@ -1,5 +1,5 @@
 const express = require('express');
-const app = express(); //we will use this for get methods etc.
+const app = express();
 const socketio = require('socket.io')
 
 let namespaces = require('./data/namespaces');
@@ -12,11 +12,11 @@ const expressServer = app.listen(9000); //listening to http server, 9000 port.
 const io = socketio(expressServer) //out socket io server is listening to the http server
 
 
-
-io.of('/').on('connection', (socket)=>{ //it emits it, when client connects on the page, on main namespace.
+//it emits it, when client connects on the page, on main namespace.
+io.of('/').on('connection', (socket)=>{
     //socket.handshake header of reuqest
     //build an array to send back with the img and endpoint for each NS
-    let nsData = namespaces.map((ns)=>{
+    let nsData = namespaces.map((ns)=>{  //ns: each namespace
         return{
             img: ns.img,
             endpoint: ns.endpoint
@@ -65,8 +65,11 @@ namespaces.forEach((namespace)=>{
             const nsRoom = namespace.rooms.find((room)=>{
                 return room.roomTitle === roomTitle;
             })
-            nsRoom.addMessage(fullMsg);
-            io.of(namespace.endpoint).to(roomTitle).emit('messageToClients', fullMsg)
+            if(nsRoom === undefined){}
+            else{
+                nsRoom.addMessage(fullMsg);
+                io.of(namespace.endpoint).to(roomTitle).emit('messageToClients', fullMsg)
+            }
         })
     })
 })

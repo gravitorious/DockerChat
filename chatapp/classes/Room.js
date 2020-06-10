@@ -5,7 +5,7 @@ class Room{
         this.roomTitle = roomTitle;
         this.namespace = namespace;
         this.privateRoom = privateRoom;
-        this.history = [];
+        this.history = []; //old messages
     }
     addMessage(message){
         this.history.push(message);
