@@ -1,0 +1,34 @@
+version: '3.2'
+services:
+  nginx:
+    image: nginx_build
+    #build: ./nginx
+    ports:
+      - "80:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+  redis:
+    image: redis:latest
+    ports:
+      - "83:6379"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+  server:
+    #build: ./server
+    image: server_build
+    ports:
+      - "81:9000"
+    deploy:
+      mode: replicated
+      replicas: 2
+      placement:
+        constraints:
+          - node.role == worker      

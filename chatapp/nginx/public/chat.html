@@ -4,25 +4,23 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-1 namespaces">
-            <div class="namespace" ns="/wiki"><img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg/103px-Wikipedia-logo-v2.svg.png"></div>
-            <div class="namespace" ns="/mozilla"><img src="https://www.mozilla.org/media/img/logos/firefox/logo-quantum.9c5e96634f92.png"></div>
-            <div class="namespace" ns="/linux"><img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Tux.png"></div>
+            <!-- JS will update this dynamically!! -->
         </div>
         <div class="col-sm-2 rooms">
+            <h2>DockerChat</h2>
             <h3>Rooms</h3>
             <ul class="room-list">
-                <li onclick="joinRoom(1,2)"><span class="glyphicon glyphicon-lock"></span>Main Room</li>
-                <li onclick="joinRoom(2,1)"><span class="glyphicon glyphicon-globe"></span>Meeting Room</li>
+                <!-- JS will update this dynamically!! -->
             </ul>
         </div>
         <div class="chat-panel col-sm-9">
             <div class="room-header row col-6">
                 <div class="col-sm-3"><span class="curr-room-text">Current Room</span> <span class="curr-room-num-users">Users <span class="glyphicon glyphicon-user"></span></span></div>
                 <div class="col-sm-3 search pull-right">
-                    <span class="glyphicon glyphicon-search"></span>
+                        <span class="glyphicon glyphicon-search"></span>
                     <input type="text" id="search-box" placeholder="Search" />
                 </div>
-            </div>
+            </div> 
             <div class="message-form">
                 <form id="user-input">
                     <div class="col-sm-12">
@@ -40,5 +38,7 @@
     </div>
 </div>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="/chatScript.js"></script>
+<script src="./socket.io.js"></script>
+<script src="./chatScript.js"></script>
+<script src="./joinNs.js"></script>
+<script src="./joinRoom.js"></script>

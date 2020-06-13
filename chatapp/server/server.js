@@ -12,6 +12,25 @@ const expressServer = app.listen(9000); //listening to http server, 9000 port.
 const io = socketio(expressServer) //out socket io server is listening to the http server
 
 
+const redis = require('socket.io-redis')
+io.adapter(redis({ host: '83.212.77.36', port: 83 }));
+
+
+/*
+const express = require('express');
+const app = express();
+const server = require("http").createServer(app);
+const socketio = require('socket.io')
+const PORT = 9000;
+server.listen(PORT);
+app.use(express.static(__dirname + '/public'));
+
+const io = socketio(server) //out socket io server is listening to the http server
+var redis = require('socket.io-redis');
+io.adapter(redis({ host: 'localhost', port: 6379 }));
+let namespaces = require('./data/namespaces');*/
+
+
 //it emits it, when client connects on the page, on main namespace.
 io.of('/').on('connection', (socket)=>{
     //socket.handshake header of reuqest
@@ -45,7 +64,7 @@ namespaces.forEach((namespace)=>{
             })
             if(nsRoom === undefined){}
             else{
-                nsSocket.emit('historyCatchUp', nsRoom.history);
+                //nsSocket.emit('historyCatchUp', nsRoom.history);
             }
             //send back the new number of users connected to this room
             updateUsersInRoom(namespace, roomToJoin)

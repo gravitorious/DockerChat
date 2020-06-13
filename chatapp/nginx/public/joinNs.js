@@ -5,15 +5,21 @@ function joinNs(endpoint){
         nsSocket.close();
         // remove the eventListener before it's added again
         document.querySelector('#user-input').removeEventListener('submit',formSubmission)
-        nsSocket = io(`http://localhost:9000${endpoint}`, {
+        nsSocket = io(`83.212.77.36:81${endpoint}`, {
             query: {
                 username
-            }
+            },
+            // WARNING: in that case, there is no fallback to long-polling
+            transports: ['websocket'] // or [ 'websocket', 'polling' ], which is the same thing
+
         })
         flag = 1
     }
     if(flag === 0){
-        nsSocket = io(`http://localhost:9000${endpoint}`)
+        nsSocket = io(`83.212.77.36:81${endpoint}`, {
+            // WARNING: in that case, there is no fallback to long-polling
+            transports: [ 'websocket' ] // or [ 'websocket', 'polling' ], which is the same thing
+        })
     }
 
     nsSocket.on('nsRoomLoad',(nsRooms)=>{
