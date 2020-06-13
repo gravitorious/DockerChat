@@ -64,7 +64,7 @@ namespaces.forEach((namespace)=>{
             })
             if(nsRoom === undefined){}
             else{
-                //nsSocket.emit('historyCatchUp', nsRoom.history);
+                nsSocket.emit('historyCatchUp', nsRoom.history);
             }
             //send back the new number of users connected to this room
             updateUsersInRoom(namespace, roomToJoin)

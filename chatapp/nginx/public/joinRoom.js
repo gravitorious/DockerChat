@@ -8,11 +8,11 @@ function joinRoom(roomName){
         // console.log(history)
         const messagesUl = document.querySelector('#messages');
         messagesUl.innerHTML = "";
-        history.forEach((msg)=>{
+        /*history.forEach((msg)=>{
             const newMsg = buildHTML(msg)
             messagesUl.innerHTML += newMsg;
         })
-        messagesUl.scrollTo(0,messagesUl.scrollHeight);
+        messagesUl.scrollTo(0,messagesUl.scrollHeight);*/
     })
     nsSocket.on('updateMembers',(numMembers)=>{
         document.querySelector('.curr-room-num-users').innerHTML = `${numMembers} <span class="glyphicon glyphicon-user"></span>`
