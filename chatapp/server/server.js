@@ -16,20 +16,6 @@ const redis = require('socket.io-redis')
 io.adapter(redis({ host: '83.212.77.36', port: 83 }));
 
 
-/*
-const express = require('express');
-const app = express();
-const server = require("http").createServer(app);
-const socketio = require('socket.io')
-const PORT = 9000;
-server.listen(PORT);
-app.use(express.static(__dirname + '/public'));
-
-const io = socketio(server) //out socket io server is listening to the http server
-var redis = require('socket.io-redis');
-io.adapter(redis({ host: 'localhost', port: 6379 }));
-let namespaces = require('./data/namespaces');*/
-
 
 //it emits it, when client connects on the page, on main namespace.
 io.of('/').on('connection', (socket)=>{

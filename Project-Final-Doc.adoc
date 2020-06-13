@@ -1,0 +1,179 @@
+= *Τελική Εργασία Εργαστήριο                          Υπολογιστική Νέφους και Υπηρεσίες Πανεπιστήμιο Δυτικής Αττικής Μηχανικών Πληροφορικής και Υπολογιστών*
+
+
+
+=== *Δημιουργοί*
+161014
+
+161050
+
+cse46097
+
+
+
+
+
+== *Παρουσίαση Εργασίας*
+
+Η εφαρμογή DockerApp βασίζεται στην δημιουργία ενός instant chat, το οποίο γίνεται deploy μέσω docker swarm. 
+
+Github: https://github.com/nicktheblackbeard/DockerChat
+
+Μερικά στιγμιότυπα της εφαρμογής φαίνονται στις παρακάτω εικόνες.
+
+image::https://imgur.com/O4t4UDT.jpg[width=900,height=500]
+
+image::https://imgur.com/AptN1jh.jpg[width=900,height=500]
+
+image::https://imgur.com/0tcAw8f.jpg[width=900,height=500]
+
+
+
+
+
+Παρατηρούμε ότι η εφαρμογή περιέχει τα namespaces (θεματολογία) στην πρώτη στήλη αριστερά, και τα δωμάτια για κάθε ένα από αυτά. Στην συγκεκριμένη περίπτωση έχουμε 3 namespaces, και μερικά δωμάτια για κάθε ένα από αυτά.
+
+Στην εφαρμογή έχουμε πρόσβαση μέσω του url:
+http://83.212.77.36/chat.html
+
+Όλοι όσοι είναι συνδεδεμένοι σε ένα δωμάτιο, βλέπουν τα μηνύματα που ανταλλάζονται εκείνη την στιγμή στο συγκεκριμένο δωμάτιο.
+
+*Αν ο χρήστης αλλάξει κάποιο δωμάτιο (ή namespace), τότε ΔΕΝ θα φαίνονται τα μηνύματα του room που εισήλθε τελευταία (κάθε φορά δηλαδή, βλέπει τα μηνύματα που ανταλλάζονται από την ώρα που συνδέεται και μετά).*
+
+
+== Εργαλεία εργασίας
+Για την ανάπτυξη εφαρμογής χρησιμοποιήθηκε η javascript σε συνδυασμό με την Nodejs. Για την γρήγορη επικοινωνία και σχετικά εύκολη υλοποίηση του client και του server χρησιμοποιήθηκε η βιβλιοθήκη *socket.io*, η οποία βασίζεται στην επικοινωνία μέσω των WebSockets.
+
+*Γιατί WebSockets;*
+
+Full-duplex ασύγχρονη επικοινωνία, δηλαδή ο client και ο server μπορούν και ανταλλάζουν μηνύματα ο ένας με τον άλλον ανεξάρτητα. παρόμοια όπως γίνεται με το πρωτόκολλο TCP. Επίσης, η socket.io βιβλιοθήκη προσφέρει βιβλιοθήκες οι οποίες έχουν αρκετά υψηλό security, και γίνεται πολύ πιο εύκολη η υλοποίηση των websockets. 
+
+Επιπλέον, χρησιμοποιήθηκε ο load balancer Nginx και η in-memory key–value database *Redis*. Για μια απλή εφαρμογή ενός chat, θεωρήσαμε ότι το redis είναι το κατάλληλο εργαλείο για την αποθήκευση των messages και τον διαμοιρασμό τους σε όλα τα server instances ώστε να ενημερώνονται κατάλληλα όλοι οι χρήστες.
+
+Για το deploy, χρησιμοποιήθηκε η τεχνολογία *Docker Swarm*. 
+
+Το Docker Swarm αποτελείται συνολικά από 3 VMs τα οποία φαίνονται παρακάτω.
+
+
+
+
+[source,python]
+-----------------
+root@snf-12308:/home/user/test_service_1# docker node ls
+ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
+ilbspninphkydchne6to82dad *   snf-12308           Ready               Active              Leader              18.09.7
+ilri6drzxhle3jezi0q8avzev     snf-12390           Ready               Active                                  18.09.7
+ncjg4ow2jc9mkk195e5fnyp3c     snf-12400           Ready               Active                                  18.09.7
+
+-----------------
+
+*Κάθε VM*, έχει ένα αντίγραφο της εφαρμογής. *Σε κάθε worker*, μεταβαίνουμε στον φάκελο “chatapp/scripts/” και τρέχουμε την εντολή 
+[source,command]
+---------------
+makefile worker
+---------------
+ώστε να εκτελεστεί το παρακάτω Dockerfile.
+
+
+
+[source,DockerFile]
+-----------------
+FROM node:latest
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+COPY . .
+
+RUN npm install
+CMD ["npm","start"]
+
+-----------------
+Στην συνέχεια τρέχουμε *στον Manager* (μέσα από το παραπάνω path) την εντολή
+[source,DockerFile]
+-----------------
+makefile manager
+-----------------
+
+η οποία αρχικά κάνει build το παρακάτω Dockerfile.
+
+
+[source,DockerFile]
+-----------------
+FROM nginx:latest
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+COPY . .
+
+
+
+RUN cp  /usr/src/app/public/* /usr/share/nginx/html/
+
+-----------------
+
+και docker stack deploy το παρακάτω yml αρχείο:
+
+
+[source,YML]
+-----------------
+version: '3.2'
+services:
+  nginx:
+    image: nginx_build
+    #build: ./nginx
+    ports:
+      - "80:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+  redis:
+    image: redis:latest
+    ports:- "83:6379"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+  server:
+    #build: ./server
+    image: server_build
+    ports:
+      - "81:9000"
+    deploy:
+      mode: replicated
+      replicas: 2
+      placement:
+        constraints:
+          - node.role == worker
+
+-----------------
+
+Παρατηρούμε ότι έχουμε 3 microservices. Το nginx, το redis, και το server.
+
+Ο manager αναλαμβάνει να τρέξει το nginx και το redis, ενώ ο server γίνεται replicate μόνο σε workers. Συνολικά λοιπόν, έχουμε 2 servers, που ο κάθε ένας τρέχει στον αντίστοιχο worker.
+
+
+=== Εργαλεια Εργασιας 2.1.
+O redis ακούει στην δημόσια IP του manager στο port 83. Αυτό φυσικά όπως γίνεται κατανοητό, δεν προτείνεται για επαγγελματική χρήση. Μια λύση σε αυτό είναι ο redis να ακούει στην IP διεύθυνση που έχει μέσα στο swarm, ώστε να μην είναι προσβάσιμος από τον έξω κόσμο, αλλά μόνο από τα instances του server. Επίσης, αν θέλαμε να αποθηκεύουμε τα δεδομένα, θα μπορούσαμε να χρησιμοποιήσουμε το Redis ως in memory database (λόγω ταχύτητας) και ανά τακτά χρονικά διαστήματα (ή/και πριν το restart του server) να ενημερώνονται minions, από τα οποία κάθε ένα, θα κρατάει το history ενός room. Το κάθε minio θα έχει συγκεκριμένο label, ανάλογα με το room. 
+
+
+=== Εργαλεία Εργασίας 2.2
+Για το redis χρησιμοποιήσαμε μια βιβλιοθήκη του socket io (και ήταν ένας επιπλέον λόγος για να χρησιμοποιήσουμε το socket io), την socket.io-redis, η οποία μας βοηθάει σχεδόν άμεσα να χρησιμοποιήσουμε το redis μέσω των παρακάτω εντολών.
+
+[source,commands]
+-----------------
+const redis = require('socket.io-redis')
+io.adapter(redis({ host: '83.212.77.36', port: 83 }));
+
+-----------------
+
+
+
+
+
+
+

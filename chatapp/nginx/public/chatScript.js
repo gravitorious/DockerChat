@@ -5,7 +5,6 @@ const socket = io('83.212.77.36:81', {
     },
     // WARNING: in that case, there is no fallback to long-polling
     transports: ['websocket'] // or [ 'websocket', 'polling' ], which is the same thing
-
 }); // /endpoint
 let nsSocket = "";
 
